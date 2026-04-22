@@ -1,0 +1,59 @@
+// ============================================================
+//  build.gradle  —  Service Provider System (Gradle Version)
+//  Java 21 | Spring Boot 3.2 | SQLite | JPA | REST | Thymeleaf
+// ============================================================
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'application'
+}
+
+group   = 'com.serviceprovider'
+version = '1.0.0'
+
+// ======= JAVA 21 FIX (same as maven.compiler.source=21) =======
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Console mode entry point
+application {
+    mainClass = 'main.MainApp'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // SQLite
+    implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
+
+    // JPA + Hibernate
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // REST API
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // HTML Templates
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // H2 Database (JPA dev mode)
+    runtimeOnly 'com.h2database:h2'
+
+    // JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// ============================================================
+//  HOW TO RUN:
+//  Console mode : ./gradlew run
+//  Spring Boot  : ./gradlew bootRun
+//  Build JAR    : ./gradlew build
+//  Run JAR      : java -jar build/libs/ServiceProviderSystem-1.0.0.jar
+// ============================================================

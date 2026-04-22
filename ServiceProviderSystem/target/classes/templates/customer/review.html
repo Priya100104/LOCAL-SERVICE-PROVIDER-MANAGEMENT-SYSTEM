@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><title>Rate & Review</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+        body{background:#f0f4f8;min-height:100vh;display:flex;flex-direction:column}
+        .navbar{background:#1565c0;padding:14px 32px;display:flex;align-items:center;gap:20px}
+        .navbar h1{color:white;font-size:18px;flex:1}
+        .navbar a{color:rgba(255,255,255,0.85);text-decoration:none;font-size:14px;padding:6px 12px;border-radius:4px}
+        .navbar a:hover{background:rgba(255,255,255,0.15)}
+        .page{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+        .card{background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);width:100%;max-width:540px;overflow:hidden}
+        .card-top{background:linear-gradient(135deg,#f59e0b,#e67e00);padding:28px 32px;color:white;text-align:center}
+        .card-top h2{font-size:22px;margin-bottom:6px}
+        .card-top p{opacity:.9;font-size:14px}
+        .card-body{padding:32px}
+        .service-info{background:#f9f9f9;border-radius:10px;padding:16px;margin-bottom:22px;font-size:14px}
+        .service-info div{margin-bottom:6px;color:#555}
+        .service-info strong{color:#333}
+        label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:8px}
+        .star-rating{display:flex;flex-direction:row-reverse;justify-content:center;gap:6px;margin-bottom:20px}
+        .star-rating input{display:none}
+        .star-rating label{font-size:42px;color:#ddd;cursor:pointer;margin:0;padding:0 2px;transition:color .15s}
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label{color:#f59e0b}
+        input[type=text],textarea{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;margin-bottom:16px}
+        input[type=text]:focus,textarea:focus{border-color:#f59e0b;box-shadow:0 0 0 3px #fff8e1}
+        textarea{resize:vertical;min-height:100px}
+        .btn{width:100%;padding:12px;background:#f59e0b;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+        .btn:hover{background:#e67e00}
+        .btn-back{display:block;text-align:center;margin-top:14px;color:#888;font-size:14px;text-decoration:none}
+        .rating-hint{text-align:center;font-size:13px;color:#888;margin-bottom:16px;min-height:20px}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <h1>🔧 Service Provider System</h1>
+    <a href="/web/customer/dashboard">Dashboard</a>
+    <a href="/web/customer/mybookings">My Bookings</a>
+    <a href="/web/logout">Logout</a>
+</nav>
+<div class="page">
+    <div class="card">
+        <div class="card-top">
+            <h2>⭐ Rate & Review</h2>
+            <p>Share your experience to help others</p>
+        </div>
+        <div class="card-body">
+
+            <!-- Service summary -->
+            <div class="service-info">
+                <div><strong>Service:</strong> <span th:text="${booking.serviceType}"></span></div>
+                <div><strong>Provider:</strong> <span th:text="${booking.provider.businessName}"></span></div>
+                <div><strong>Date:</strong> <span th:text="${booking.scheduledDate.toLocalDate()}"></span></div>
+            </div>
+
+            <form th:action="@{/web/customer/review/{id}(id=${booking.id})}" method="post">
+
+                <!-- Star Rating -->
+                <label style="text-align:center;display:block">Your Rating *</label>
+                <div class="star-rating">
+                    <input type="radio" name="rating" id="s5" value="5" required><label for="s5">★</label>
+                    <input type="radio" name="rating" id="s4" value="4"><label for="s4">★</label>
+                    <input type="radio" name="rating" id="s3" value="3"><label for="s3">★</label>
+                    <input type="radio" name="rating" id="s2" value="2"><label for="s2">★</label>
+                    <input type="radio" name="rating" id="s1" value="1"><label for="s1">★</label>
+                </div>
+                <div class="rating-hint" id="ratingHint">Click a star to rate</div>
+
+                <label>Review Title *</label>
+                <input type="text" name="reviewTitle" placeholder="e.g. Excellent work, very professional" required/>
+
+                <label>Your Comments *</label>
+                <textarea name="reviewComment" placeholder="Describe your experience in detail..." required></textarea>
+
+                <button type="submit" class="btn">Submit Review</button>
+            </form>
+            <a href="/web/customer/mybookings" class="btn-back">← Cancel, go back</a>
+        </div>
+    </div>
+</div>
+<script>
+const hints = ['','Terrible 😞','Poor 😕','Okay 😐','Good 😊','Excellent 🤩'];
+document.querySelectorAll('.star-rating input').forEach(input => {
+    input.addEventListener('change', () => {
+        document.getElementById('ratingHint').textContent = hints[input.value] || '';
+    });
+});
+</script>
+</body>
+</html>

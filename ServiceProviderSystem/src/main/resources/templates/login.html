@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Service Provider System</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+        body{background:#f0f4f8;min-height:100vh;display:flex;flex-direction:column}
+        .navbar{background:#1565c0;padding:14px 32px;display:flex;align-items:center;gap:20px}
+        .navbar h1{color:white;font-size:18px;flex:1}
+        .navbar a{color:rgba(255,255,255,0.85);text-decoration:none;font-size:14px}
+        .page{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+        .card{background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);width:100%;max-width:440px;overflow:hidden}
+        .card-top{background:linear-gradient(135deg,#1565c0,#0d47a1);padding:32px;text-align:center;color:white}
+        .card-top h2{font-size:24px;margin-bottom:6px}
+        .card-top p{opacity:.85;font-size:14px}
+        .card-body{padding:32px}
+        .error-box{background:#ffebee;border:1px solid #ef9a9a;color:#c62828;padding:10px 14px;border-radius:8px;margin-bottom:18px;font-size:14px}
+        .success-box{background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;padding:10px 14px;border-radius:8px;margin-bottom:18px;font-size:14px}
+        .role-tabs{display:flex;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin-bottom:22px}
+        .role-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;background:#f5f5f5;color:#555;border:none;transition:all .2s}
+        .role-tab.active{background:#1565c0;color:white}
+        label{display:block;font-size:13px;font-weight:500;color:#444;margin-bottom:5px}
+        input{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:16px;outline:none}
+        input:focus{border-color:#1565c0;box-shadow:0 0 0 3px #e3f2fd}
+        .btn{width:100%;padding:12px;background:#1565c0;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+        .btn:hover{background:#0d47a1}
+        .footer-link{text-align:center;margin-top:18px;font-size:14px;color:#666}
+        .footer-link a{color:#1565c0;text-decoration:none;font-weight:500}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <h1>🔧 Service Provider System</h1>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Browse Providers</a>
+    <a href="/web/register">Register</a>
+</nav>
+<div class="page">
+    <div class="card">
+        <div class="card-top">
+            <h2>Welcome Back</h2>
+            <p>Login to manage your services</p>
+        </div>
+        <div class="card-body">
+            <div th:if="${errorMsg}"   class="error-box"   th:text="${errorMsg}"></div>
+            <div th:if="${successMsg}" class="success-box" th:text="${successMsg}"></div>
+
+            <!-- Role Tabs -->
+            <div class="role-tabs">
+                <button class="role-tab active" id="tab-customer" onclick="setRole('customer')">👤 Customer</button>
+                <button class="role-tab"        id="tab-admin"    onclick="setRole('admin')">🛡 Admin</button>
+            </div>
+
+            <form action="/web/login" method="post">
+                <input type="hidden" name="role" id="roleInput" value="customer"/>
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter your username" required/>
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required/>
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <div class="footer-link">
+                New here? <a href="/web/register">Create a Customer Account</a>
+            </div>
+            <div class="footer-link" style="margin-top:8px">
+                <small style="color:#999">Admin: admin / admin123</small>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function setRole(role) {
+    document.getElementById('roleInput').value = role;
+    document.getElementById('tab-customer').classList.toggle('active', role === 'customer');
+    document.getElementById('tab-admin').classList.toggle('active',    role === 'admin');
+}
+</script>
+</body>
+</html>

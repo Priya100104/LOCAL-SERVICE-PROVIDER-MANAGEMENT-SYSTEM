@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Provider - Service Provider System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f5f7fa; color: #333; }
+        .navbar { background: #1565c0; color: white; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+        .navbar a { color: white; text-decoration: none; font-size: 15px; padding: 6px 12px; border-radius: 4px; }
+        .navbar a:hover { background: rgba(255,255,255,0.15); }
+        .navbar h1 { font-size: 18px; font-weight: 600; flex: 1; }
+        .container { max-width: 640px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 36px; }
+        .card h2 { font-size: 22px; color: #1565c0; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label  { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
+        .form-group input,
+        .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus,
+        .form-group select:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 2px #e3f2fd; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .error-msg { background: #ffebee; border: 1px solid #ef9a9a; color: #c62828; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .btn-bar { display: flex; gap: 12px; margin-top: 24px; }
+        .btn { padding: 11px 24px; border-radius: 6px; font-size: 15px; font-weight: 500; border: none; cursor: pointer; text-decoration: none; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; }
+        .btn-gray    { background: #eceff1; color: #333; }
+        .hint { font-size: 12px; color: #888; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>🔧 Service Provider System</h1>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Providers</a>
+    <a href="/web/providers/add">Login or register</a>
+    <a href="/api/providers" target="_blank">REST API</a>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2>➕ Register New Service Provider</h2>
+
+        <!-- Error message (shown on duplicate username etc.) -->
+        <div class="error-msg" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <!-- Form posts to /web/providers/add (POST) -->
+        <form action="/web/providers/add" method="post" th:object="${provider}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Business Name *</label>
+                    <input type="text" th:field="*{businessName}" placeholder="e.g. Raj Plumbing" required/>
+                </div>
+                <div class="form-group">
+                    <label>Service Type *</label>
+                    <select th:field="*{serviceType}" required>
+                        <option value="">-- Select --</option>
+                        <option th:each="type : ${serviceTypes}"
+                                th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Username *</label>
+                    <input type="text" th:field="*{username}" placeholder="unique_username" required/>
+                    <p class="hint">Must be unique across all providers</p>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" th:field="*{email}" placeholder="email@example.com" required/>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" th:field="*{phone}" placeholder="9876543210"/>
+                </div>
+                <div class="form-group">
+                    <label>Hourly Rate (₹) *</label>
+                    <input type="number" th:field="*{hourlyRate}" placeholder="300" min="0" step="50" required/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Years of Experience *</label>
+                <input type="number" th:field="*{yearsOfExperience}" placeholder="e.g. 5" min="0" max="50" required/>
+            </div>
+
+            <div class="btn-bar">
+                <button type="submit" class="btn btn-primary">✅ Register Provider</button>
+                <a href="/web/providers" class="btn btn-gray">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
