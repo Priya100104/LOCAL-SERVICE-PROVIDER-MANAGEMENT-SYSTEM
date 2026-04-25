@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Bookings – Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#0f172a;color:#f1f5f9;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #334155;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:.2s;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        nav .admin-badge{background:#7c3aed;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;}
+        .container{max-width:1200px;margin:32px auto;padding:0 24px;}
+        h2{font-family:'Space Grotesk',sans-serif;font-size:22px;margin-bottom:6px;}
+        .sub{color:#64748b;font-size:14px;margin-bottom:24px;}
+        .card{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden;}
+        table{width:100%;border-collapse:collapse;font-size:14px;}
+        th{background:#0f172a;padding:12px 18px;text-align:left;color:#64748b;font-size:13px;font-weight:500;}
+        td{padding:13px 18px;border-bottom:1px solid #1e3a5f;color:#e2e8f0;vertical-align:middle;}
+        tr:last-child td{border-bottom:none;}
+        .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500;}
+        .b-scheduled{background:#1e3a5f;color:#60a5fa;}
+        .b-completed{background:#14532d;color:#86efac;}
+        .b-cancelled{background:#450a0a;color:#fca5a5;}
+        .stars{color:#f59e0b;}
+        .btn{display:inline-block;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:.2s;}
+        .btn-green{background:#059669;color:#fff;}
+        .btn-green:hover{background:#047857;}
+        .feedback{color:#94a3b8;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .empty{text-align:center;padding:48px;color:#475569;}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <span class="admin-badge">🛡️ ADMIN</span>
+    <a href="/web/">Home</a>
+    <a href="/web/admin/dashboard">Dashboard</a>
+    <a href="/web/providers">Providers</a>
+    <a href="/web/admin/bookings">All Bookings</a>
+    <a href="/web/providers/add">+ Add Provider</a>
+    <a href="/web/logout">Logout</a>
+</nav>
+
+<div class="container">
+    <h2>All Bookings</h2>
+    <p class="sub">Manage service bookings — mark completed so customers can leave ratings</p>
+
+    <div class="card">
+        <table th:if="${!#lists.isEmpty(bookings)}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Provider</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Rating</th>
+                    <th>Feedback</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${bookings}">
+                <td th:text="${b.id}"></td>
+                <td>
+                    <div style="font-weight:500" th:text="${b.customer.firstName + ' ' + b.customer.lastName}"></div>
+                    <div style="color:#64748b;font-size:12px" th:text="${b.customer.username}"></div>
+                </td>
+                <td style="font-weight:500" th:text="${b.provider.businessName}"></td>
+                <td th:text="${b.serviceType}"></td>
+                <td th:text="${b.bookingDate}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${'SCHEDULED'.equals(b.status) ? 'b-scheduled' : ('COMPLETED'.equals(b.status) ? 'b-completed' : 'b-cancelled')}"
+                          th:text="${b.status}"></span>
+                </td>
+                <td>
+                    <span th:if="${b.rating != null}" class="stars" th:text="${'★'.repeat(b.rating)}"></span>
+                    <span th:if="${b.rating == null}" style="color:#334155;">—</span>
+                </td>
+                <td>
+                    <span class="feedback" th:if="${b.feedback != null}" th:text="${b.feedback}" th:title="${b.feedback}"></span>
+                    <span th:if="${b.feedback == null}" style="color:#334155;">—</span>
+                </td>
+                <td>
+                    <form th:if="${'SCHEDULED'.equals(b.status)}"
+                          th:action="@{/web/booking/{id}/complete(id=${b.id})}" method="post" style="display:inline">
+                        <button class="btn btn-green">✓ Mark Complete</button>
+                    </form>
+                    <span th:if="${!'SCHEDULED'.equals(b.status)}" style="color:#334155;font-size:13px;">—</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(bookings)}">No bookings yet.</div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Providers – Service Provider System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:#1e293b;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:.2s;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        nav .nav-user{color:#60a5fa;font-size:14px;font-weight:500;}
+        nav .admin-badge{background:#7c3aed;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;}
+        .container{max-width:1100px;margin:32px auto;padding:0 20px;}
+        .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+        .page-header h2{font-family:'Space Grotesk',sans-serif;font-size:22px;color:#0f172a;}
+        .btn{display:inline-block;padding:9px 20px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500;border:none;cursor:pointer;transition:.2s;}
+        .btn-primary{background:#2563eb;color:#fff;}
+        .btn-primary:hover{background:#1d4ed8;}
+        .btn-green{background:#059669;color:#fff;}
+        .btn-green:hover{background:#047857;}
+        .btn-sm{padding:5px 12px;font-size:12px;border-radius:6px;}
+        .btn-red{background:#dc2626;color:#fff;}
+        .search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+        .search-bar input{flex:1;min-width:180px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;background:#fff;outline:none;}
+        .search-bar input:focus{border-color:#2563eb;}
+        .search-bar select{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;background:#fff;outline:none;}
+        .search-bar button,.search-bar a{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;text-decoration:none;font-weight:500;}
+        .table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+        table{width:100%;border-collapse:collapse;font-size:14px;}
+        th{background:#2563eb;color:#fff;padding:13px 18px;text-align:left;font-weight:500;}
+        td{padding:14px 18px;border-bottom:1px solid #f1f5f9;}
+        tr:hover td{background:#f8fafc;}
+        .badge{padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500;}
+        .b-v{background:#dcfce7;color:#166534;}
+        .b-p{background:#fef9c3;color:#854d0e;}
+        .stars{color:#f59e0b;}
+        .count-label{font-size:14px;color:#64748b;margin-bottom:12px;}
+        .empty{text-align:center;padding:48px;color:#94a3b8;}
+        .provider-link{color:#1d4ed8;text-decoration:none;font-weight:500;}
+        .provider-link:hover{text-decoration:underline;}
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Providers</a>
+    <a href="/web/providers/top">Top Rated</a>
+    <span th:if="${!isAdmin and !isCustomer}">
+        <a href="/web/login" style="background:#2563eb;color:#fff;border-radius:6px;">Login</a>
+        <a href="/web/register">Register</a>
+    </span>
+    <span th:if="${isCustomer}">
+        <a href="/web/customer/book" style="background:#059669;color:#fff;border-radius:6px;padding:6px 14px;text-decoration:none;font-size:14px;font-weight:500;">+ Book Service</a>
+        <a href="/web/customer/dashboard">My Bookings</a>
+        <span class="nav-user">👤 <span th:text="${customerName}">User</span></span>
+        <a href="/web/logout">Logout</a>
+    </span>
+    <span th:if="${isAdmin}">
+        <span class="admin-badge">🛡️ ADMIN</span>
+        <a href="/web/admin/dashboard">Dashboard</a>
+        <a href="/web/providers/add">+ Add Provider</a>
+        <a href="/web/logout">Logout</a>
+    </span>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h2 th:text="${pageTitle != null ? pageTitle : 'All Service Providers'}">Providers</h2>
+        <a href="/web/providers/add" class="btn btn-primary" th:if="${isAdmin}">+ Add New Provider</a>
+        <a href="/web/customer/book" class="btn btn-green" th:if="${isCustomer}">+ Book a Service</a>
+    </div>
+
+    <form class="search-bar" action="/web/providers" method="get">
+        <input type="text" name="search" placeholder="Search by business name…" th:value="${searchKeyword}">
+        <select name="type">
+            <option value="">All Service Types</option>
+            <option th:each="t : ${ {'Plumbing','Electrical','Cleaning','Carpentry','Painting'} }"
+                    th:value="${t}" th:text="${t}" th:selected="${filterType == t}"></option>
+        </select>
+        <button type="submit">Search</button>
+        <a href="/web/providers">Clear</a>
+    </form>
+
+    <p class="count-label">Showing <strong th:text="${totalCount}">0</strong> provider(s)</p>
+
+    <div class="table-wrap">
+        <table th:if="${!#lists.isEmpty(providers)}">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Business Name</th><th>Service Type</th>
+                    <th>Rating</th><th>Experience</th><th>Rate</th><th>Status</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${providers}">
+                <td th:text="${p.id}"></td>
+                <td><a th:href="@{/web/providers/{id}(id=${p.id})}" th:text="${p.businessName}" class="provider-link"></a></td>
+                <td th:text="${p.serviceType}"></td>
+                <td><span class="stars">★</span> <span th:text="${#numbers.formatDecimal(p.averageRating,1,1)}"></span></td>
+                <td th:text="${p.yearsOfExperience} + ' yrs'"></td>
+                <td th:text="'₹' + ${p.hourlyRate} + '/hr'"></td>
+                <td><span class="badge" th:classappend="${p.verified ? 'b-v' : 'b-p'}" th:text="${p.verified ? 'Verified' : 'Pending'}"></span></td>
+                <td>
+                    <a th:href="@{/web/providers/{id}(id=${p.id})}" class="btn btn-sm btn-primary">View</a>
+                    <a th:if="${isCustomer and p.verified}" th:href="@{/web/customer/book(providerId=${p.id})}"
+                       class="btn btn-sm btn-green">Book</a>
+                    <form th:if="${isAdmin and !p.verified}" th:action="@{/web/providers/{id}/verify(id=${p.id})}" method="post" style="display:inline">
+                        <button class="btn btn-sm btn-green">Verify</button>
+                    </form>
+                    <form th:if="${isAdmin}" th:action="@{/web/providers/{id}/delete(id=${p.id})}" method="post" style="display:inline"
+                          onsubmit="return confirm('Delete this provider?')">
+                        <button class="btn btn-sm btn-red">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(providers)}">
+            No providers found. <span th:if="${isAdmin}"><a href="/web/providers/add">Add one!</a></span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

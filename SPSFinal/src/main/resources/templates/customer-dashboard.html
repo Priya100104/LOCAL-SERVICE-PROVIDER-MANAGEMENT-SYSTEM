@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Dashboard – Service Provider System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:#1e293b;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:20px;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:.2s;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        nav .user{color:#60a5fa;font-size:14px;font-weight:500;}
+        .container{max-width:1100px;margin:32px auto;padding:0 20px;}
+        .welcome{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff;border-radius:12px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+        .welcome h2{font-size:22px;font-family:'Space Grotesk',sans-serif;}
+        .welcome p{color:#bfdbfe;font-size:14px;margin-top:4px;}
+        .btn{display:inline-block;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s;}
+        .btn-white{background:#fff;color:#1d4ed8;}
+        .btn-blue{background:#2563eb;color:#fff;}
+        .btn-blue:hover{background:#1d4ed8;}
+        .btn-green{background:#059669;color:#fff;}
+        .btn-green:hover{background:#047857;}
+        .btn-amber{background:#d97706;color:#fff;}
+        .btn-amber:hover{background:#b45309;}
+        .btn-sm{padding:5px 13px;font-size:13px;}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px;}
+        .stat{background:#fff;border-radius:10px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+        .stat-num{font-size:32px;font-weight:700;color:#1d4ed8;}
+        .stat-label{font-size:13px;color:#64748b;margin-top:4px;}
+        .card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:24px;}
+        .card-header{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;}
+        .card-header h3{font-size:16px;font-weight:600;}
+        table{width:100%;border-collapse:collapse;font-size:14px;}
+        th{background:#f8fafc;padding:12px 20px;text-align:left;color:#64748b;font-weight:500;font-size:13px;}
+        td{padding:13px 20px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+        tr:last-child td{border-bottom:none;}
+        .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500;}
+        .b-pending{background:#fef3c7;color:#92400e;}
+        .b-accepted{background:#dbeafe;color:#1d4ed8;}
+        .b-inprogress{background:#e0e7ff;color:#4338ca;}
+        .b-workdone{background:#fce7f3;color:#9d174d;}
+        .b-completed{background:#dcfce7;color:#166534;}
+        .b-cancelled{background:#fee2e2;color:#991b1b;}
+        .stars{color:#f59e0b;font-size:16px;}
+        .empty{text-align:center;padding:40px;color:#94a3b8;}
+        .flash{background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;padding:12px 20px;border-radius:8px;margin-bottom:20px;font-size:14px;}
+        .alert-workdone{background:#fdf2f8;border:1px solid #f0abfc;color:#701a75;padding:12px 20px;border-radius:8px;margin-bottom:20px;font-size:14px;}
+        .actions-cell{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Browse Providers</a>
+    <a href="/web/customer/book" style="background:#2563eb;color:#fff;">+ Book Service</a>
+    <span class="user">👤 <span th:text="${customerName}">Customer</span></span>
+    <a href="/web/logout">Logout</a>
+</nav>
+
+<div class="container">
+    <div th:if="${success}" class="flash" th:text="${success}"></div>
+
+    <!-- Alert: provider marked work done, needs customer confirmation -->
+    <div class="alert-workdone" th:if="${workDoneCount > 0}">
+        🏁 <strong><span th:text="${workDoneCount}">0</span> service(s)</strong>
+        have been marked as done by the provider. Please confirm below to complete them.
+    </div>
+
+    <!-- Welcome -->
+    <div class="welcome">
+        <div>
+            <h2>Welcome back, <span th:text="${customer.firstName}">Customer</span>! 👋</h2>
+            <p>Manage your bookings and track your services here.</p>
+        </div>
+        <a href="/web/customer/book" class="btn btn-white">+ Book a Service</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-num" th:text="${bookings.size()}">0</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" style="color:#d97706" th:text="${pendingCount}">0</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" style="color:#2563eb" th:text="${activeCount}">0</div>
+            <div class="stat-label">Active</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" style="color:#9d174d" th:text="${workDoneCount}">0</div>
+            <div class="stat-label">Needs Confirmation</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" style="color:#059669" th:text="${completedCount}">0</div>
+            <div class="stat-label">Completed</div>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3>My Bookings</h3>
+            <a href="/web/customer/book" class="btn btn-blue btn-sm">+ New Booking</a>
+        </div>
+        <table th:if="${!#lists.isEmpty(bookings)}">
+            <thead>
+                <tr><th>#</th><th>Provider</th><th>Service</th><th>Date</th><th>Status</th><th>Rating</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${bookings}">
+                <td th:text="${b.id}"></td>
+                <td>
+                    <a th:href="@{/web/providers/{id}(id=${b.provider.id})}"
+                       th:text="${b.provider.businessName}"
+                       style="color:#1d4ed8;text-decoration:none;font-weight:500;"></a>
+                </td>
+                <td th:text="${b.serviceType}"></td>
+                <td th:text="${b.bookingDate}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${
+                              'PENDING'.equals(b.status)     ? 'b-pending'    :
+                              'ACCEPTED'.equals(b.status)    ? 'b-accepted'   :
+                              'IN_PROGRESS'.equals(b.status) ? 'b-inprogress' :
+                              'WORK_DONE'.equals(b.status)   ? 'b-workdone'   :
+                              'COMPLETED'.equals(b.status)   ? 'b-completed'  : 'b-cancelled'}"
+                          th:text="${b.status}">
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${b.rating != null}" class="stars"
+                          th:text="${'★'.repeat(b.rating) + '☆'.repeat(5-b.rating)}"></span>
+                    <span th:if="${b.rating == null and 'COMPLETED'.equals(b.status)}"
+                          style="color:#94a3b8;font-size:13px;">Not rated</span>
+                    <span th:if="${b.rating == null and !'COMPLETED'.equals(b.status)}"
+                          style="color:#cbd5e1;font-size:13px;">-</span>
+                </td>
+                <td>
+                    <div class="actions-cell">
+                        <!-- WORK_DONE: customer must confirm service is done -->
+                        <form th:if="${'WORK_DONE'.equals(b.status)}"
+                              th:action="@{/web/customer/confirm/{id}(id=${b.id})}" method="post"
+                              onsubmit="return confirm('Confirm that the service has been completed?')">
+                            <button type="submit" class="btn btn-amber btn-sm">
+                                ✔ Confirm Service Done
+                            </button>
+                        </form>
+
+                        <!-- COMPLETED + no rating: show Rate button -->
+                        <a th:if="${'COMPLETED'.equals(b.status) and b.rating == null}"
+                           th:href="@{/web/customer/rate/{id}(id=${b.id})}"
+                           class="btn btn-green btn-sm">⭐ Rate & Review</a>
+
+                        <!-- COMPLETED + rated -->
+                        <span th:if="${'COMPLETED'.equals(b.status) and b.rating != null}"
+                              style="color:#059669;font-size:13px;font-weight:500;">✓ Reviewed</span>
+
+                        <!-- Other statuses -->
+                        <span th:if="${'PENDING'.equals(b.status)}"
+                              style="color:#94a3b8;font-size:13px;">Waiting for provider</span>
+                        <span th:if="${'ACCEPTED'.equals(b.status)}"
+                              style="color:#1d4ed8;font-size:13px;">Provider accepted</span>
+                        <span th:if="${'IN_PROGRESS'.equals(b.status)}"
+                              style="color:#4338ca;font-size:13px;">Work in progress</span>
+                        <span th:if="${'CANCELLED'.equals(b.status)}"
+                              style="color:#94a3b8;font-size:13px;">Cancelled</span>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(bookings)}">
+            No bookings yet. <a href="/web/customer/book" style="color:#2563eb;">Book your first service!</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

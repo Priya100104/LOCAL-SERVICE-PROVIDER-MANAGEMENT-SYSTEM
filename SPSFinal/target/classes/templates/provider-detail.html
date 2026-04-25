@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${provider.businessName} + ' – Service Provider System'">Provider Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:#1e293b;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:.2s;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        nav .nav-user{color:#60a5fa;font-size:14px;font-weight:500;}
+        nav .admin-badge{background:#7c3aed;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;}
+        .container{max-width:860px;margin:32px auto;padding:0 20px;}
+        .back{color:#64748b;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;}
+        .back:hover{color:#1d4ed8;}
+        .profile-card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px;}
+        .profile-header{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);color:#fff;padding:32px;}
+        .profile-header h2{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;}
+        .profile-header .type{background:rgba(255,255,255,.2);display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;margin-top:8px;}
+        .verified-badge{background:#059669;display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;margin-top:8px;margin-left:8px;}
+        .pending-badge{background:#d97706;display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;margin-top:8px;margin-left:8px;}
+        .profile-body{padding:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;}
+        .info-item label{font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+        .info-item p{font-size:16px;font-weight:500;margin-top:4px;}
+        .stars{color:#f59e0b;font-size:20px;}
+        .rating-num{font-size:22px;font-weight:700;color:#0f172a;margin-left:6px;}
+        .btn{display:inline-block;padding:11px 24px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.2s;}
+        .btn-green{background:#059669;color:#fff;}
+        .btn-green:hover{background:#047857;}
+        .btn-blue{background:#2563eb;color:#fff;}
+        .btn-orange{background:#d97706;color:#fff;}
+        .btn-red{background:#dc2626;color:#fff;}
+        .action-bar{padding:0 28px 28px;display:flex;gap:12px;flex-wrap:wrap;}
+        .reviews-section{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:28px;}
+        .reviews-section h3{font-family:'Space Grotesk',sans-serif;font-size:18px;margin-bottom:20px;}
+        .review-card{border:1px solid #f1f5f9;border-radius:10px;padding:18px;margin-bottom:14px;background:#fafafa;}
+        .review-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+        .reviewer{font-weight:600;font-size:14px;}
+        .review-date{font-size:12px;color:#94a3b8;}
+        .review-stars{color:#f59e0b;font-size:18px;margin-bottom:6px;}
+        .review-text{font-size:14px;color:#475569;line-height:1.6;}
+        .no-reviews{text-align:center;padding:32px;color:#94a3b8;}
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Providers</a>
+    <span th:if="${!isAdmin and !isCustomer}">
+        <a href="/web/login" style="background:#2563eb;color:#fff;border-radius:6px;">Login</a>
+        <a href="/web/register">Register</a>
+    </span>
+    <span th:if="${isCustomer}">
+        <a href="/web/customer/dashboard">My Bookings</a>
+        <span class="nav-user">👤 <span th:text="${customerName}">User</span></span>
+        <a href="/web/logout">Logout</a>
+    </span>
+    <span th:if="${isAdmin}">
+        <span class="admin-badge">🛡️ ADMIN</span>
+        <a href="/web/admin/dashboard">Dashboard</a>
+        <a href="/web/logout">Logout</a>
+    </span>
+</nav>
+
+<div class="container">
+    <a href="/web/providers" class="back">← Back to Providers</a>
+
+    <div class="profile-card">
+        <div class="profile-header">
+            <h2 th:text="${provider.businessName}">Business Name</h2>
+            <div>
+                <span class="type" th:text="${provider.serviceType}"></span>
+                <span class="verified-badge" th:if="${provider.verified}">✓ Verified</span>
+                <span class="pending-badge" th:if="${!provider.verified}">⏳ Pending</span>
+            </div>
+        </div>
+
+        <div class="profile-body">
+            <div class="info-item">
+                <label>Rating</label>
+                <p>
+                    <span class="stars">★</span>
+                    <span class="rating-num" th:text="${#numbers.formatDecimal(provider.averageRating,1,1)}"></span>
+                    <span style="color:#94a3b8;font-size:13px;" th:text="'(' + ${#lists.size(reviews)} + ' reviews)'"></span>
+                </p>
+            </div>
+            <div class="info-item">
+                <label>Hourly Rate</label>
+                <p th:text="'₹' + ${provider.hourlyRate} + ' / hr'"></p>
+            </div>
+            <div class="info-item">
+                <label>Experience</label>
+                <p th:text="${provider.yearsOfExperience} + ' years'"></p>
+            </div>
+            <div class="info-item">
+                <label>Email</label>
+                <p th:text="${provider.email}"></p>
+            </div>
+            <div class="info-item">
+                <label>Phone</label>
+                <p th:text="${provider.phone}"></p>
+            </div>
+            <div class="info-item">
+                <label>Member Since</label>
+                <p th:text="${provider.createdAt}"></p>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <!-- Customer: book this provider -->
+            <a th:if="${isCustomer and provider.verified}"
+               th:href="@{/web/customer/book}"
+               class="btn btn-green">📋 Book This Provider</a>
+
+            <!-- Admin: verify -->
+            <form th:if="${isAdmin and !provider.verified}"
+                  th:action="@{/web/providers/{id}/verify(id=${provider.id})}" method="post" style="display:inline">
+                <button class="btn btn-orange">✓ Verify Provider</button>
+            </form>
+
+            <!-- Admin: delete -->
+            <form th:if="${isAdmin}"
+                  th:action="@{/web/providers/{id}/delete(id=${provider.id})}" method="post" style="display:inline"
+                  onsubmit="return confirm('Delete this provider?')">
+                <button class="btn btn-red">🗑 Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <h3>⭐ Customer Reviews (<span th:text="${#lists.size(reviews)}">0</span>)</h3>
+
+        <div th:if="${!#lists.isEmpty(reviews)}">
+            <div class="review-card" th:each="r : ${reviews}">
+                <div class="review-header">
+                    <span class="reviewer" th:text="${r.customer.firstName + ' ' + r.customer.lastName}">Customer</span>
+                    <span class="review-date" th:text="${r.bookingDate}"></span>
+                </div>
+                <div class="review-stars" th:text="${'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}"></div>
+                <p class="review-text" th:text="${r.feedback}"></p>
+            </div>
+        </div>
+
+        <div class="no-reviews" th:if="${#lists.isEmpty(reviews)}">
+            No reviews yet. Be the first to book and review this provider!
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

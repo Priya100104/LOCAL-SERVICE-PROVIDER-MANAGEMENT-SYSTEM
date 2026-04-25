@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Service Provider System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:#1e293b;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:.2s;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        nav .nav-login{background:#2563eb;color:#fff!important;font-weight:500;}
+        nav .nav-register{border:1px solid #475569;color:#cbd5e1!important;}
+        nav .nav-user{color:#60a5fa;font-size:14px;font-weight:500;}
+        nav .admin-badge{background:#7c3aed;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;}
+        .hero{background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#0369a1 100%);color:#fff;padding:72px 32px;text-align:center;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+        .hero h2{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;margin-bottom:14px;position:relative;}
+        .hero p{font-size:17px;opacity:.85;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;position:relative;}
+        .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;}
+        .btn{display:inline-block;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;transition:.2s;border:none;cursor:pointer;}
+        .btn-white{background:#fff;color:#1d4ed8;}
+        .btn-white:hover{background:#f0f9ff;}
+        .btn-outline{border:2px solid rgba(255,255,255,.6);color:#fff;}
+        .btn-outline:hover{background:rgba(255,255,255,.1);}
+        .btn-blue{background:#2563eb;color:#fff;}
+        .btn-blue:hover{background:#1d4ed8;}
+        .stats{display:flex;gap:20px;padding:32px;justify-content:center;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e2e8f0;}
+        .stat-card{text-align:center;padding:20px 32px;}
+        .stat-num{font-size:38px;font-weight:700;color:#1d4ed8;font-family:'Space Grotesk',sans-serif;}
+        .stat-label{font-size:13px;color:#64748b;margin-top:4px;font-weight:500;}
+        .divider{width:1px;background:#e2e8f0;margin:12px 0;}
+        .section{padding:48px 32px;max-width:1000px;margin:0 auto;}
+        .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;margin-bottom:20px;color:#0f172a;}
+        .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+        .feature{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #f1f5f9;transition:.2s;}
+        .feature:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-2px);}
+        .feature-icon{font-size:28px;margin-bottom:12px;}
+        .feature h4{font-size:15px;font-weight:600;margin-bottom:6px;}
+        .feature p{font-size:13px;color:#64748b;line-height:1.6;}
+        .services{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:32px;}
+        .service-chip{background:#fff;border:1px solid #e2e8f0;border-radius:50px;padding:10px 22px;font-size:14px;font-weight:500;text-decoration:none;color:#1e293b;transition:.2s;}
+        .service-chip:hover{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+        footer{background:#1e293b;color:#64748b;text-align:center;padding:24px;font-size:13px;margin-top:40px;}
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <a href="/web/">Home</a>
+    <a href="/web/providers">Browse Providers</a>
+    <a href="/web/providers/top">Top Rated</a>
+
+    <!-- Guest links -->
+    <span th:if="${!isAdmin and !isCustomer}">
+        <a href="/web/login" class="nav-login">Login</a>
+        <a href="/web/register" class="nav-register">Register</a>
+    </span>
+
+    <!-- Customer links -->
+    <span th:if="${isCustomer}">
+        <a href="/web/customer/book" style="background:#059669;color:#fff;border-radius:6px;padding:6px 14px;text-decoration:none;font-size:14px;font-weight:500;">+ Book Service</a>
+        <a href="/web/customer/dashboard">My Bookings</a>
+        <span class="nav-user">👤 <span th:text="${customerName}">User</span></span>
+        <a href="/web/logout">Logout</a>
+    </span>
+
+    <!-- Admin links -->
+    <span th:if="${isAdmin}">
+        <span class="admin-badge">🛡️ ADMIN</span>
+        <a href="/web/admin/dashboard">Dashboard</a>
+        <a href="/web/admin/bookings">Bookings</a>
+        <a href="/web/providers/add">+ Add Provider</a>
+        <a href="/web/logout">Logout</a>
+    </span>
+</nav>
+
+<div class="hero">
+    <h2>Find Trusted Service Professionals</h2>
+    <p>Book verified plumbers, electricians, cleaners, carpenters and painters near you — instantly.</p>
+    <div class="hero-btns">
+        <a href="/web/providers" class="btn btn-white">Browse Providers</a>
+        <a href="/web/register" class="btn btn-outline" th:if="${!isCustomer and !isAdmin}">Register as Customer</a>
+        <a href="/web/customer/book" class="btn btn-outline" th:if="${isCustomer}">+ Book a Service</a>
+    </div>
+</div>
+
+<!-- Service type quick links -->
+<div class="services">
+    <a href="/web/providers?type=Plumbing"   class="service-chip">🔧 Plumbing</a>
+    <a href="/web/providers?type=Electrical" class="service-chip">⚡ Electrical</a>
+    <a href="/web/providers?type=Cleaning"   class="service-chip">🧹 Cleaning</a>
+    <a href="/web/providers?type=Carpentry"  class="service-chip">🪵 Carpentry</a>
+    <a href="/web/providers?type=Painting"   class="service-chip">🎨 Painting</a>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-num" th:text="${totalProviders}">0</div>
+        <div class="stat-label">Total Providers</div>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-card">
+        <div class="stat-num" style="color:#059669" th:text="${verifiedProviders}">0</div>
+        <div class="stat-label">Verified Providers</div>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-card">
+        <div class="stat-num" style="color:#d97706" th:text="${pendingProviders}">0</div>
+        <div class="stat-label">Pending Verification</div>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-card">
+        <div class="stat-num" style="color:#7c3aed" th:text="${totalCustomers}">0</div>
+        <div class="stat-label">Registered Customers</div>
+    </div>
+    <div class="divider"></div>
+    <div class="stat-card">
+        <div class="stat-num" style="color:#0891b2" th:text="${totalBookings}">0</div>
+        <div class="stat-label">Total Bookings</div>
+    </div>
+</div>
+
+<div class="section">
+    <p class="section-title">How It Works</p>
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">👤</div>
+            <h4>1. Register / Login</h4>
+            <p>Create a free customer account or log in to access all features and manage your bookings.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🔍</div>
+            <h4>2. Browse Providers</h4>
+            <p>Filter by service type, search by name, and view ratings and reviews from real customers.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📋</div>
+            <h4>3. Book a Service</h4>
+            <p>Choose a verified provider, pick a date, add notes and confirm your booking in seconds.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">⭐</div>
+            <h4>4. Rate & Review</h4>
+            <p>After the job is complete, leave a star rating and feedback to help the community.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🛡️</div>
+            <h4>Admin Controls</h4>
+            <p>Admins verify providers, manage bookings and mark jobs complete so ratings can be given.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📡</div>
+            <h4>REST API</h4>
+            <p>Full JSON REST API available at <code>/api/providers</code> for external integrations.</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    Service Provider System &nbsp;|&nbsp; Spring Boot 3.2 · Java 21 · H2 · Thymeleaf
+    &nbsp;|&nbsp; <a href="/api/providers" style="color:#60a5fa;" target="_blank">REST API</a>
+    &nbsp;|&nbsp; <a href="/h2-console" style="color:#60a5fa;" target="_blank">H2 Console</a>
+</footer>
+
+</body>
+</html>

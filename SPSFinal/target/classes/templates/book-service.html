@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book a Service – Service Provider System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:#1e293b;}
+        nav{background:#1e293b;padding:14px 32px;display:flex;align-items:center;gap:20px;}
+        nav .brand{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;flex:1;}
+        nav a{color:#94a3b8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;}
+        nav a:hover{background:#334155;color:#f1f5f9;}
+        .container{max-width:700px;margin:40px auto;padding:0 20px;}
+        h2{font-family:'Space Grotesk',sans-serif;font-size:24px;margin-bottom:24px;color:#0f172a;}
+        .card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:32px;}
+        label{display:block;color:#475569;font-size:13px;font-weight:600;margin-bottom:6px;margin-top:20px;}
+        select,input,textarea{width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:15px;color:#1e293b;background:#fff;outline:none;transition:.2s;}
+        select:focus,input:focus,textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+        textarea{resize:vertical;min-height:80px;}
+        .provider-card{border:2px solid #e2e8f0;border-radius:10px;padding:16px;margin:8px 0;cursor:pointer;transition:.2s;}
+        .provider-card:hover,.provider-card.selected{border-color:#2563eb;background:#eff6ff;}
+        .provider-card input[type=radio]{margin-right:10px;}
+        .provider-info{display:flex;justify-content:space-between;align-items:center;}
+        .provider-name{font-weight:600;font-size:15px;}
+        .provider-meta{font-size:13px;color:#64748b;margin-top:4px;}
+        .provider-rate{font-weight:700;color:#1d4ed8;font-size:15px;}
+        .stars{color:#f59e0b;}
+        .btn{width:100%;padding:14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:28px;transition:.2s;}
+        .btn:hover{background:#1d4ed8;}
+        .filter-row{display:flex;gap:10px;margin-bottom:16px;}
+        .filter-row select{flex:1;}
+        .filter-row button{padding:10px 20px;background:#1e293b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="brand">🔧 Service Provider System</span>
+    <a href="/web/">Home</a>
+    <a href="/web/customer/dashboard">My Bookings</a>
+    <a href="/web/logout">Logout</a>
+</nav>
+
+<div class="container">
+    <h2>📋 Book a Service</h2>
+
+    <div class="card">
+        <form action="/web/customer/book" method="post" id="bookingForm">
+
+            <label>Filter by Service Type</label>
+            <div class="filter-row">
+                <select id="filterType" onchange="filterProviders()">
+                    <option value="">All Service Types</option>
+                    <option th:each="t : ${serviceTypes}" th:value="${t}" th:text="${t}"></option>
+                </select>
+            </div>
+
+            <label>Select a Verified Provider *</label>
+            <div id="providerList">
+                <div th:each="p : ${providers}" class="provider-card"
+                     th:attr="data-type=${p.serviceType}"
+                     onclick="selectProvider(this, [[${p.id}]])">
+                    <label style="cursor:pointer;margin:0;display:flex;align-items:flex-start;gap:12px;">
+                        <input type="radio" name="providerId" th:value="${p.id}" required style="width:auto;margin-top:3px;">
+                        <div style="flex:1;">
+                            <div class="provider-info">
+                                <span class="provider-name" th:text="${p.businessName}"></span>
+                                <span class="provider-rate" th:text="'₹' + ${p.hourlyRate} + '/hr'"></span>
+                            </div>
+                            <div class="provider-meta">
+                                <span th:text="${p.serviceType}"></span> •
+                                <span th:text="${p.yearsOfExperience} + ' yrs exp'"></span> •
+                                <span class="stars">★</span>
+                                <span th:text="${#numbers.formatDecimal(p.averageRating,1,1)}"></span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <label>Preferred Date *</label>
+            <input type="date" name="bookingDate" th:min="${today}" required>
+
+            <label>Notes / Description (Optional)</label>
+            <textarea name="notes" placeholder="Describe what needs to be done..."></textarea>
+
+            <button type="submit" class="btn">Confirm Booking</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function selectProvider(card, id) {
+    document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+}
+function filterProviders() {
+    const type = document.getElementById('filterType').value;
+    document.querySelectorAll('.provider-card').forEach(c => {
+        c.style.display = (!type || c.dataset.type === type) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

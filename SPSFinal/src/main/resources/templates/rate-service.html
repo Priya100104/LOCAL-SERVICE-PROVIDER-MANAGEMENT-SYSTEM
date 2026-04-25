@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Service – Service Provider System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+        .card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:40px;width:100%;max-width:480px;}
+        h2{color:#f1f5f9;font-family:'Space Grotesk',sans-serif;font-size:22px;text-align:center;margin-bottom:6px;}
+        .subtitle{color:#64748b;font-size:14px;text-align:center;margin-bottom:28px;}
+        .provider-name{text-align:center;color:#60a5fa;font-size:18px;font-weight:600;margin-bottom:24px;}
+        .star-group{display:flex;justify-content:center;gap:8px;margin-bottom:28px;}
+        .star-group input{display:none;}
+        .star-group label{font-size:40px;cursor:pointer;color:#334155;transition:.1s;line-height:1;}
+        .star-group input:checked ~ label,
+        .star-group label:hover,
+        .star-group label:hover ~ label{color:#f59e0b;}
+        /* CSS-only star trick: reverse order with flex-direction */
+        .star-group{flex-direction:row-reverse;}
+        .star-group label:hover,
+        .star-group label:hover ~ label{color:#f59e0b;}
+        .star-group input:checked ~ label{color:#f59e0b;}
+        label.text-label{display:block;color:#94a3b8;font-size:13px;font-weight:500;margin-bottom:8px;}
+        textarea{width:100%;padding:12px 14px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:15px;resize:vertical;min-height:100px;outline:none;transition:.2s;}
+        textarea:focus{border-color:#2563eb;}
+        textarea::placeholder{color:#475569;}
+        .btn{width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:24px;transition:.2s;}
+        .btn:hover{background:#1d4ed8;}
+        .back{text-align:center;margin-top:16px;}
+        .back a{color:#64748b;font-size:14px;text-decoration:none;}
+        .booking-info{background:#0f172a;border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:14px;color:#94a3b8;}
+        .booking-info span{color:#f1f5f9;}
+        .rating-label{text-align:center;font-size:14px;color:#f59e0b;margin-bottom:16px;font-weight:500;min-height:20px;}
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>⭐ Rate Your Service</h2>
+    <p class="subtitle">How was your experience?</p>
+    <p class="provider-name" th:text="${booking.provider.businessName}">Provider</p>
+
+    <div class="booking-info">
+        Service: <span th:text="${booking.serviceType}"></span> &nbsp;|&nbsp;
+        Date: <span th:text="${booking.bookingDate}"></span>
+    </div>
+
+    <form th:action="@{/web/customer/rate/{id}(id=${booking.id})}" method="post">
+        <label class="text-label">Your Rating *</label>
+        <div class="star-group" id="starGroup">
+            <input type="radio" name="rating" id="s5" value="5" required>
+            <label for="s5" title="5 stars">★</label>
+            <input type="radio" name="rating" id="s4" value="4">
+            <label for="s4" title="4 stars">★</label>
+            <input type="radio" name="rating" id="s3" value="3">
+            <label for="s3" title="3 stars">★</label>
+            <input type="radio" name="rating" id="s2" value="2">
+            <label for="s2" title="2 stars">★</label>
+            <input type="radio" name="rating" id="s1" value="1">
+            <label for="s1" title="1 star">★</label>
+        </div>
+        <p class="rating-label" id="ratingLabel"></p>
+
+        <label class="text-label">Your Feedback *</label>
+        <textarea name="feedback" placeholder="Tell us about the service quality, punctuality, and overall experience..." required></textarea>
+
+        <button type="submit" class="btn">Submit Rating</button>
+    </form>
+    <div class="back"><a href="/web/customer/dashboard">← Back to Dashboard</a></div>
+</div>
+<script>
+const labels = ['','Terrible','Poor','Okay','Good','Excellent!'];
+document.querySelectorAll('.star-group input').forEach(r => {
+    r.addEventListener('change', () => {
+        document.getElementById('ratingLabel').textContent = labels[r.value] + ' (' + r.value + '/5)';
+    });
+});
+</script>
+</body>
+</html>
